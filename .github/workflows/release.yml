@@ -15,7 +15,8 @@ jobs:
         sudo apt-get autoremove
     - name: Hardcode nodejs path for uglifyjs so it doesn't conflict with emcc's nodejs
       run: |
-        echo '#!/bin/sh -e\nexec /usr/bin/node /usr/bin/uglifyjs "$@"' >/tmp/uglifyjs
+        echo '#!/bin/sh -e' >/tmp/uglifyjs
+        echo 'exec /usr/bin/node /usr/bin/uglifyjs "$@"' >/tmp/uglifyjs
         chmod a+x /tmp/uglifyjs && sudo mv -t /usr/local/bin /tmp/uglifyjs
     - name: Install python dependencies
       run: |
