@@ -1,0 +1,45 @@
+name: Release
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Get the branch
+      id: get_branch
+      run: |
+        if [ ${GITHUB_REF/refs\/tags\//} != ${GITHUB_REF} ]; then
+          echo ::set-output name=BRANCH::${GITHUB_REF/refs\/tags\//}
+          echo ::set-output name=IMAGE_NAME_SUFFIX::${GITHUB_REF/refs\/tags\//}
+          echo ::set-output name=IMAGE_PATH::"pynab.img.xz"
+        elif [ ${GITHUB_REF/refs\/heads\//} = "releng" ]; then
+          echo ::set-output name=BRANCH::releng
+          echo ::set-output name=IMAGE_NAME_SUFFIX::releng
+          echo ::set-output name=IMAGE_PATH::"pynab-prerelease.img.xz"
+        else
+          echo ::set-output name=BRANCH::${GITHUB_REF/refs\/heads\//}
+          echo ::set-output name=IMAGE_NAME_SUFFIX::${GITHUB_REF/refs\/heads\//}
+          echo ::set-output name=IMAGE_PATH::"pynab.img.xz"
+        fi
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install bzip2 libgconf-2-4 node-less cmake build-essential clang-format-6.0 uglifyjs chromium ccache libncurses6 gfortran f2c swig g++-8
+        sudo apt-get clean
+        sudo apt-get autoremove
+    - name: Hardcode nodejs path for uglifyjs so it doesn't conflict with emcc's nodejs
+      run: |
+        echo '#!/bin/sh -e\nexec /usr/bin/node /usr/bin/uglifyjs "$@"' >/tmp/uglifyjs
+        chmod a+x /tmp/uglifyjs && sudo mv -t /usr/local/bin /tmp/uglifyjs
+    - name: Install python dependencies
+      run: |
+        sudo pip install pytest pytest-xdist pytest-instafail pytest-rerunfailures selenium PyYAML flake8
+        sudo rm -rf /root/.cache/pip
+    - name: Make
+      run: make
+    - uses: actions/upload-artifact@v2
+      with:
+        name: Build output
+        path: build
