@@ -10,7 +10,7 @@ jobs:
     - name: Install system dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install bzip2 libgconf-2-4 node-less cmake build-essential clang-format-6.0 uglifyjs chromium-bsu ccache libncurses5-dev gfortran f2c swig g++-8
+        sudo apt-get install bzip2 libgconf-2-4 node-less cmake build-essential clang-format-6.0 uglifyjs chromium-bsu ccache libncurses5-dev gfortran f2c swig g++-8 python3.8
         sudo apt-get clean
         sudo apt-get autoremove
     - name: Hardcode nodejs path for uglifyjs so it doesn't conflict with emcc's nodejs
