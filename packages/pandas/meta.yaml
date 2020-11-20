@@ -1,10 +1,10 @@
 package:
   name: pandas
-  version: 1.0.5
+  version: 1.1.4
 
 source:
-  url: https://files.pythonhosted.org/packages/31/29/ede692aa6547dfc1f07a4d69e8411b35225218bcfbe9787e78b67a35d103/pandas-1.0.5.tar.gz
-  sha256: 69c5d920a0b2a9838e677f78f4dde506b95ea8e4d30da25859db6469ded84fa8
+  url: https://files.pythonhosted.org/packages/09/39/fb93ed98962d032963418cd1ea5927b9e11c4c80cb1e0b45dea769d8f9a5/pandas-1.1.4.tar.gz
+  sha256: a979d0404b135c63954dea79e6246c45dd45371a88631cdbb4877d844e6de3b6
 
 build:
   cflags: -Wno-implicit-function-declaration
