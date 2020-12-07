@@ -10,17 +10,18 @@ jobs:
     - name: Install system dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install bzip2 libgconf-2-4 node-less cmake build-essential clang-format-6.0 uglifyjs chromium-bsu ccache libncurses5-dev gfortran f2c swig g++-8 python3.8
+        sudo apt-get install bzip2 libgconf-2-4 node-less node-commander cmake build-essential clang-format-6.0 uglifyjs chromium-bsu ccache libncurses5-dev gfortran f2c swig g++-8 python3.8
         sudo apt-get clean
         sudo apt-get autoremove
     - name: Hardcode nodejs path for uglifyjs so it doesn't conflict with emcc's nodejs
       run: |
+        sudo npm install -g uglify-js
         echo '#!/bin/sh -e' >/tmp/uglifyjs
         echo 'exec /usr/bin/node /usr/bin/uglifyjs "$@"' >/tmp/uglifyjs
         chmod a+x /tmp/uglifyjs && sudo mv -t /usr/local/bin /tmp/uglifyjs
     - name: Install python dependencies
       run: |
-        sudo pip install pytest pytest-xdist pytest-instafail pytest-rerunfailures selenium PyYAML flake8
+        sudo pip install pytest pytest-xdist pytest-instafail pytest-rerunfailures pytest-httpserver selenium PyYAML flake8
         sudo rm -rf /root/.cache/pip
     - name: Make
       run: make
