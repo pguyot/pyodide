@@ -10,7 +10,7 @@ jobs:
     - name: Install system dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install bzip2 libgconf-2-4 node-less node-commander cmake build-essential clang-format-6.0 uglifyjs chromium-bsu ccache libncurses5-dev gfortran f2c swig g++-8 python3.8
+        sudo apt-get install bzip2 libgconf-2-4 node-less node-commander cmake build-essential clang-format-6.0 chromium-bsu ccache libncurses5-dev gfortran f2c swig g++-8 python3.8
         sudo apt-get clean
         sudo apt-get autoremove
     - name: Test node
@@ -19,17 +19,17 @@ jobs:
         test $(which node) = /usr/local/bin/node || exit 1
     - name: Test uglifyjs
       run: |
+        sudo npm install -g uglify-js
         which uglifyjs
-        test $(which uglifyjs) = /usr/bin/uglifyjs || exit 1
-        head /usr/bin/uglifyjs
+        test $(which uglifyjs) = /usr/local/bin/uglifyjs || exit 1
+        head /usr/local/bin/uglifyjs
     - name: Fix node path in script uglifyjs
       run: |
-        sudo sed -i 's|/usr/bin/env node|/usr/local/bin/node|g' /usr/bin/uglifyjs
-        sudo npm install -g exit
-        head /usr/bin/uglifyjs
+        sudo sed -i 's|/usr/bin/env node|/usr/local/bin/node|g' /usr/local/bin/uglifyjs
+        head /usr/local/bin/uglifyjs
         echo '"use strict";' > /tmp/test.js
         echo 'var hello = "world";' >> /tmp/test.js
-        /usr/bin/uglifyjs /tmp/test.js
+        /usr/local/bin/uglifyjs /tmp/test.js || echo "uglifyjs failed"
     - name: Install python dependencies
       run: |
         sudo pip install pytest pytest-xdist pytest-instafail pytest-rerunfailures pytest-httpserver selenium PyYAML flake8
