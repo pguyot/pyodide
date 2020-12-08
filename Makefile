@@ -101,7 +101,7 @@ build/pyodide.asm.data: root/.built
 		cd build; \
 		python $(FILEPACKAGER) pyodide.asm.data --abi=$(PYODIDE_PACKAGE_ABI) --lz4 --preload ../root/lib@lib --js-output=pyodide.asm.data.js --use-preload-plugins \
 	)
-	uglifyjs build/pyodide.asm.data.js -o build/pyodide.asm.data.js
+	uglifyjs build/pyodide.asm.data.js -o build/pyodide.asm.data.js || echo "uglifyjs failed"
 
 
 build/pyodide_dev.js: src/pyodide.js
@@ -185,7 +185,7 @@ build/test.data: $(CPYTHONLIB)
 		cd build; \
 		python $(FILEPACKAGER) test.data --abi=$(PYODIDE_PACKAGE_ABI) --lz4 --preload ../$(CPYTHONLIB)/test@/lib/python3.8/test --js-output=test.js --export-name=pyodide._module --exclude __pycache__ \
 	)
-	uglifyjs build/test.js -o build/test.js
+	uglifyjs build/test.js -o build/test.js || echo "uglifyjs failed"
 
 
 root/.built: \
