@@ -25,6 +25,7 @@ jobs:
     - name: Fix node path in script uglifyjs
       run: |
         sudo sed -i 's|/usr/bin/env node|/usr/local/bin/node|g' /usr/bin/uglifyjs
+        sudo npm install -g exit
         head /usr/bin/uglifyjs
         echo '"use strict";' > /tmp/test.js
         echo 'var hello = "world";' >> /tmp/test.js
