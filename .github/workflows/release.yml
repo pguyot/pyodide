@@ -10,7 +10,7 @@ jobs:
     - name: Install system dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y bzip2 libgconf-2-4 node-less cmake build-essential clang-format-6.0 chromium-bsu ccache libncurses5-dev gfortran f2c swig g++-8 python3.8 uglifyjs
+        sudo apt-get install -y bzip2 libgconf-2-4 node-less node-commander cmake build-essential clang-format-6.0 chromium-bsu ccache libncurses5-dev gfortran f2c swig g++-8 python3.8 uglifyjs
         sudo apt-get clean
         sudo apt-get autoremove
     - name: Test node
