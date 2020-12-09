@@ -208,6 +208,10 @@ workflows:
             tags:
               only: /.*/
       - deploy-release:
+          requires:
+            - lint
+            - build
+            - test-python
           filters:
             branches:
               only: master
