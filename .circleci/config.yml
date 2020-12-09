@@ -203,35 +203,11 @@ workflows:
       - build-test-minimal:
           requires:
             - lint
-      - test-chrome:
-          requires:
-            - build
-      - test-firefox:
-          requires:
-            - build
-          filters:
-            tags:
-              only: /.*/
       - test-python:
           filters:
             tags:
               only: /.*/
-      - benchmark:
-          requires:
-            - build
       - deploy-release:
-          requires:
-            - test-firefox
-            - test-python
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /^\d+\.\d+\.\d+$/
-      - deploy-s3:
-          requires:
-            - test-firefox
-            - test-python
           filters:
             branches:
               only: master
