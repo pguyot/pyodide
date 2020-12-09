@@ -55,7 +55,7 @@ jobs:
             - ./packages/.artifacts
 
       - store_artifacts:
-          path: /home/circleci/repo/build/
+          path: /root/repo/build/
 
   build-test-minimal:
     <<: *defaults
