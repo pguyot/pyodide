@@ -17,6 +17,7 @@ from time import sleep
 from typing import Dict, Set, Optional, List
 
 from . import common
+from .io import parse_package_config
 
 
 @total_ordering
@@ -28,8 +29,9 @@ class Package:
         if not pkgpath.is_file():
             raise ValueError(f"Directory {pkgdir} does not contain meta.yaml")
 
-        self.meta: dict = common.parse_package(pkgpath)
+        self.meta: dict = parse_package_config(pkgpath)
         self.name: str = self.meta["package"]["name"]
+        self.library: bool = self.meta.get("build", {}).get("library", False)
 
         assert self.name == pkgdir.stem
 
@@ -46,10 +48,10 @@ class Package:
                     "pyodide_build",
                     "buildpkg",
                     str(self.pkgdir / "meta.yaml"),
-                    "--package_abi",
-                    str(args.package_abi),
                     "--cflags",
                     args.cflags,
+                    "--cxxflags",
+                    args.cxxflags,
                     "--ldflags",
                     args.ldflags,
                     "--target",
@@ -62,19 +64,25 @@ class Package:
                 stderr=subprocess.STDOUT,
             )
 
-        with open(self.pkgdir / "build.log", "r") as f:
-            shutil.copyfileobj(f, sys.stdout)
+        try:
+            p.check_returncode()
+        except subprocess.CalledProcessError:
+            print(f"Error building {self.name}. Printing build logs.")
 
-        p.check_returncode()
+            with open(self.pkgdir / "build.log", "r") as f:
+                shutil.copyfileobj(f, sys.stdout)
 
-        shutil.copyfile(
-            self.pkgdir / "build" / (self.name + ".data"),
-            outputdir / (self.name + ".data"),
-        )
-        shutil.copyfile(
-            self.pkgdir / "build" / (self.name + ".js"),
-            outputdir / (self.name + ".js"),
-        )
+            raise
+
+        if not self.library:
+            shutil.copyfile(
+                self.pkgdir / "build" / (self.name + ".data"),
+                outputdir / (self.name + ".data"),
+            )
+            shutil.copyfile(
+                self.pkgdir / "build" / (self.name + ".js"),
+                outputdir / (self.name + ".js"),
+            )
 
     # We use this in the priority queue, which pops off the smallest element.
     # So we want the smallest element to have the largest number of dependents
@@ -209,8 +217,15 @@ def build_packages(packages_dir: Path, outputdir: Path, args) -> None:
         "import_name_to_package_name": {},
     }
 
+    libraries = [pkg.name for pkg in pkg_map.values() if pkg.library]
+
     for name, pkg in pkg_map.items():
-        package_data["dependencies"][name] = pkg.dependencies
+        if pkg.library:
+            continue
+
+        package_data["dependencies"][name] = [
+            x for x in pkg.dependencies if x not in libraries
+        ]
         for imp in pkg.meta.get("test", {}).get("imports", [name]):
             package_data["import_name_to_package_name"][imp] = name
 
@@ -236,17 +251,18 @@ def make_parser(parser):
         help="Output directory in which to put all built packages",
     )
     parser.add_argument(
-        "--package_abi",
-        type=int,
-        required=True,
-        help="The ABI number for the packages to be built",
-    )
-    parser.add_argument(
         "--cflags",
         type=str,
         nargs="?",
         default=common.DEFAULTCFLAGS,
         help="Extra compiling flags",
+    )
+    parser.add_argument(
+        "--cxxflags",
+        type=str,
+        nargs="?",
+        default=common.DEFAULTCXXFLAGS,
+        help="Extra C++ specific compiling flags",
     )
     parser.add_argument(
         "--ldflags",
