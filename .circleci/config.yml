@@ -304,13 +304,8 @@ workflows:
       - deploy-release:
           requires:
             - lint
-            - test-python
-            - test-core-firefox
-            - test-packages-firefox
-            - test-core-chrome
-            - test-packages-chrome
-            - test-emsdk
-            - build-docs
+            - build-core
+            - build-packages
           filters:
             branches:
               only: master
